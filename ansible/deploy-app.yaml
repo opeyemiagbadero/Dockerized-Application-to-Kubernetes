@@ -1,0 +1,76 @@
+---
+- name: Setup Kubernetes Namespaces and Secrets for Web Deployment
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+        - vars.yml
+  tasks:
+    - name: Create namespace
+      community.kubernetes.k8s:
+        kubeconfig: "/home/upsea/.kube/config"
+        state: present
+        kind: Namespace
+        name: "{{ item.name }}"
+      loop:
+        - { name: 'dev' }
+        - { name: 'uat' }
+        - { name: 'prod' }
+
+    - name: Create Docker registry secret for dev namespace
+      command: >
+        kubectl create secret docker-registry docker-registry-secret
+        --docker-server=docker.io
+        --docker-username=opeyemiagbadero
+        --docker-password={{ docker_password }}
+        --namespace=dev
+
+    - name: Create Docker registry secret for uat namespace
+      command: >
+        kubectl create secret docker-registry docker-registry-secret
+        --docker-server=docker.io
+        --docker-username=opeyemiagbadero
+        --docker-password={{ docker_password }}
+        --namespace=uat
+
+    - name: Create Docker registry secret for prod namespace
+      command: >
+        kubectl create secret docker-registry docker-registry-secret
+        --docker-server=docker.io
+        --docker-username=opeyemiagbadero
+        --docker-password={{ docker_password }}
+        --namespace=prod
+
+    #Add similar tasks for deploying Helm charts...
+
+    - name: Deploy Helm chart for dev from local path
+      kubernetes.core.helm:
+        name: 1
+        chart_ref: /home/upsea/DevOps-prj/addon_service/1/1
+        values_files: 
+          - /home/upsea/DevOps-prj/addon_service/1/1/values.yaml
+          - /home/upsea/DevOps-prj/addon_service/1/1/dev-values.yaml
+        release_namespace: dev
+        wait: true
+        timeout: 600s
+
+    - name: Deploy Helm chart for uat from local path
+      kubernetes.core.helm:
+        name: 1
+        chart_ref: /home/upsea/DevOps-prj/addon_service/1/1
+        values_files: 
+          - /home/upsea/DevOps-prj/addon_service/1/1/values.yaml
+          - /home/upsea/DevOps-prj/addon_service/1/1/uat-values.yaml
+        release_namespace: uat
+        wait: true
+        timeout: 600s
+
+    - name: Deploy Helm chart for prod from local path
+      kubernetes.core.helm:
+        name: 1
+        chart_ref: /home/upsea/DevOps-prj/addon_service/1/1
+        values_files: 
+          - /home/upsea/DevOps-prj/addon_service/1/1/values.yaml
+          - /home/upsea/DevOps-prj/addon_service/1/1/prod-values.yaml
+        release_namespace: prod
+        wait: true
+        timeout: 600s

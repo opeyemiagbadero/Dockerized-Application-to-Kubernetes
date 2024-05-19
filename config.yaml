@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: py-app
+  labels:
+    app: py-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: py-app
+  template:
+    metadata:
+      labels:
+        app: py-app
+    spec:
+      containers:
+      - name: py-app
+        image: opeyemiagbadero/demo-app:1b
+        ports:
+        - containerPort: 5000
+        env: 
+          - name: ENV
+            value: "dev"  # Fixed indentation here
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: docker-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: py-app-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: py-app
+  ports:
+  - port: 5000
+    targetPort: 5000

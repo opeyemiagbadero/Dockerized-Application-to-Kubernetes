@@ -1,0 +1,11 @@
+appName: py-app
+appReplicas: 2
+appImage: opeyemiagbadero/demo-app
+appVerion: 1b
+containerPort: 5000
+servicePort: 5000
+serviceType: LoadBalancer
+secretKey: docker-registry-secret
+imagepullPolicy: Always
+envName: ENV
+value: "dev"
