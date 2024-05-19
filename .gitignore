@@ -1,3 +1,3 @@
 # .gitignore
 commands.md
-
+/home/upsea/DevOps-prj/addon_service/1/ansible/vars.yml
